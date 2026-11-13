@@ -10,11 +10,11 @@ import {
   GraduationCap,
   ShieldCheck,
   CheckCircle,
-  UserCheck
+  Home
 } from 'lucide-react';
 import { Modal } from './Modal';
 
-export const Navbar = ({ onToggleSidebar }) => {
+export const Navbar = ({ onToggleSidebar, onGoToHome }) => {
   const { user, logout, refreshUser } = useAuth();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [topupAmount, setTopupAmount] = useState('200');
@@ -57,6 +57,18 @@ export const Navbar = ({ onToggleSidebar }) => {
           >
             <Menu className="w-5 h-5" />
           </button>
+
+          {/* Home Link */}
+          {onGoToHome && (
+            <button
+              onClick={onGoToHome}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+              title="View Public Landing Page"
+            >
+              <Home className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="hidden sm:inline">Landing Page</span>
+            </button>
+          )}
 
           {/* Student Tag Header for Academic Project */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl">

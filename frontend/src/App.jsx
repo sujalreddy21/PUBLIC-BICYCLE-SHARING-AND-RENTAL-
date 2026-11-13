@@ -3,7 +3,8 @@ import { useAuth } from './context/AuthContext';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 
-// 12 Screens
+// Pages
+import { HomePage } from './pages/HomePage';
 import { LoginRegister } from './pages/LoginRegister';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { BicycleManagement } from './pages/BicycleManagement';
@@ -18,13 +19,17 @@ import { StationAttendantDashboard } from './pages/StationAttendantDashboard';
 import { ReportsAnalytics } from './pages/ReportsAnalytics';
 
 export default function App() {
-  const { user, loading, token } = useAuth();
+  const { user, loading, token, logout } = useAuth();
+  // View states: 'home' | 'login' | 'dashboard'
+  const [currentView, setCurrentView] = useState('home');
+  const [selectedRoleForLogin, setSelectedRoleForLogin] = useState('member');
   const [currentScreen, setCurrentScreen] = useState(2);
   const [targetBikeForCheckout, setTargetBikeForCheckout] = useState(null);
 
   // Set default initial screen based on user role upon login
   useEffect(() => {
-    if (user) {
+    if (user && token) {
+      setCurrentView('dashboard');
       if (user.role === 'admin' || user.role === 'operations_manager') {
         setCurrentScreen(2);
       } else if (user.role === 'station_attendant') {
@@ -33,7 +38,7 @@ export default function App() {
         setCurrentScreen(8);
       }
     }
-  }, [user?.role]);
+  }, [user?.role, token]);
 
   if (loading) {
     return (
@@ -43,11 +48,63 @@ export default function App() {
     );
   }
 
-  // SCREEN 1: LOGIN AND REGISTRATION
-  if (!token || !user) {
-    return <LoginRegister onLoginSuccess={() => {}} />;
+  // 1. Not logged in and on Home Page:
+  if (!token && currentView === 'home') {
+    return (
+      <HomePage
+        onSelectRoleLogin={(role) => {
+          setSelectedRoleForLogin(role);
+          setCurrentView('login');
+        }}
+      />
+    );
   }
 
+  // 2. Not logged in and on Login/Register Page for chosen role:
+  if (!token && currentView === 'login') {
+    return (
+      <LoginRegister
+        initialRole={selectedRoleForLogin}
+        onBackToHome={() => setCurrentView('home')}
+        onLoginSuccess={() => setCurrentView('dashboard')}
+      />
+    );
+  }
+
+  // 3. User is logged in, but clicked "View Public Landing Page":
+  if (token && currentView === 'home') {
+    return (
+      <div>
+        {/* Floating Back to Dashboard Banner */}
+        <div className="sticky top-0 z-50 bg-slate-950 text-white px-4 py-2.5 flex items-center justify-between text-xs font-semibold">
+          <span>Logged in as: <strong className="text-emerald-400">{user?.name}</strong> ({user?.role})</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className="px-3.5 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all"
+            >
+              ← Return to Your Dashboard
+            </button>
+            <button
+              onClick={logout}
+              className="px-3 py-1 rounded-full bg-slate-800 hover:bg-rose-900 text-slate-300 transition-all"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        <HomePage
+          onSelectRoleLogin={(role) => {
+            setSelectedRoleForLogin(role);
+            setCurrentView('dashboard');
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 4. Logged in and viewing Dashboard (12 screens):
   const navigateToScreen = (screenNumber, extraData = null) => {
     if (extraData?.bikeId) {
       setTargetBikeForCheckout(extraData.bikeId);
@@ -89,7 +146,11 @@ export default function App() {
   };
 
   return (
-    <DashboardLayout currentScreen={currentScreen} onSelectScreen={setCurrentScreen}>
+    <DashboardLayout
+      currentScreen={currentScreen}
+      onSelectScreen={setCurrentScreen}
+      onGoToHome={() => setCurrentView('home')}
+    >
       {renderActiveScreen()}
     </DashboardLayout>
   );

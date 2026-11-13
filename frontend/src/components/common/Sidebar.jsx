@@ -14,10 +14,11 @@ import {
   ShieldCheck,
   LogOut,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Home
 } from 'lucide-react';
 
-export const Sidebar = ({ currentScreen, onSelectScreen, isOpen, onClose }) => {
+export const Sidebar = ({ currentScreen, onSelectScreen, onGoToHome, isOpen, onClose }) => {
   const { user, login } = useAuth();
   const role = user?.role || 'member';
 
@@ -133,16 +134,22 @@ export const Sidebar = ({ currentScreen, onSelectScreen, isOpen, onClose }) => {
       >
         {/* Top Brand Logo */}
         <div className="p-5 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
+          <div
+            onClick={onGoToHome}
+            className="flex items-center gap-3 cursor-pointer group"
+            title="Click to go to Public Landing Page"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white">
               <Bike className="w-6 h-6 stroke-[2.2]" />
             </div>
             <div>
-              <h1 className="text-base font-extrabold tracking-tight text-white leading-tight">
-                VELOSHARE <span className="text-blue-400">PRO</span>
+              <h1 className="text-base font-extrabold tracking-tight text-white leading-tight flex items-center gap-1.5">
+                <span>Mybicycles</span>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded">PRO</span>
               </h1>
-              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
-                Public Bicycle System
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold group-hover:text-emerald-400 transition-colors flex items-center gap-1">
+                <Home className="w-2.5 h-2.5" />
+                <span>Visit Landing Page →</span>
               </p>
             </div>
           </div>

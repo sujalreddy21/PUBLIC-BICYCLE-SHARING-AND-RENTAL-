@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sidebar } from '../common/Sidebar';
 import { Navbar } from '../common/Navbar';
 
-export const DashboardLayout = ({ currentScreen, onSelectScreen, children }) => {
+export const DashboardLayout = ({ currentScreen, onSelectScreen, onGoToHome, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -11,13 +11,17 @@ export const DashboardLayout = ({ currentScreen, onSelectScreen, children }) => 
       <Sidebar
         currentScreen={currentScreen}
         onSelectScreen={onSelectScreen}
+        onGoToHome={onGoToHome}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:pl-72 min-w-0 transition-all">
-        <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <Navbar
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          onGoToHome={onGoToHome}
+        />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>

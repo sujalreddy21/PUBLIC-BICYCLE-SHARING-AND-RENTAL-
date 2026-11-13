@@ -1,0 +1,83 @@
+version: '3.8'
+
+# ====================================================================
+# Public Bicycle Sharing and Rental Management System
+# Docker Compose Multi-Container Orchestration
+# Developer: SUJAL REDDY (2303A51713) | Academic Year: 2026-2027
+# ====================================================================
+
+services:
+  # Database Service: MongoDB
+  mongodb:
+    image: mongo:6.0
+    container_name: pbs-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: pbs_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - pbs-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Backend REST API Service: Node.js & Express
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pbs-backend
+    restart: always
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/pbs_db
+      - JWT_SECRET=pbs_super_secret_jwt_key_2026_sujal_reddy
+      - JWT_EXPIRE=30d
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - pbs-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # Frontend Web UI Service: React + Vite + Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pbs-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - pbs-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  pbs-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

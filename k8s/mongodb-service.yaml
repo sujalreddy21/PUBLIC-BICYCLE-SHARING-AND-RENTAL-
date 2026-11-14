@@ -1,10 +1,31 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: mongodb
+  labels:
+    app: pbs
+    tier: database
+    developer: sujal-reddy
+    hall-ticket: "2303A51713"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 27017
+      targetPort: 27017
+      name: mongodb
+  selector:
+    app: pbs
+    tier: database
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: mongodb-service
   labels:
     app: pbs
     tier: database
+    developer: sujal-reddy
+    hall-ticket: "2303A51713"
 spec:
   type: ClusterIP
   ports:

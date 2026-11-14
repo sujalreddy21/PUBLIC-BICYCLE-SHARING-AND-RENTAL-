@@ -5,6 +5,8 @@ metadata:
   labels:
     app: pbs
     tier: backend
+    developer: sujal-reddy
+    hall-ticket: "2303A51713"
 spec:
   replicas: 2
   selector:
@@ -19,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: pbs-backend:latest
+          image: sujalreddy/pbs-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000

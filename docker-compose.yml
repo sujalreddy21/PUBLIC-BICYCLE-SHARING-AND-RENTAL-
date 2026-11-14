@@ -29,6 +29,7 @@ services:
 
   # Backend REST API Service: Node.js & Express
   backend:
+    image: sujalreddy/pbs-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -56,6 +57,7 @@ services:
 
   # Frontend Web UI Service: React + Vite + Nginx
   frontend:
+    image: sujalreddy/pbs-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile

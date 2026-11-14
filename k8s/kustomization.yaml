@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - configmap.yaml
+  - secret.yaml
+  - mongodb-pvc.yaml
+  - mongodb-service.yaml
+  - mongodb-deployment.yaml
+  - backend-service.yaml
+  - backend-deployment.yaml
+  - frontend-service.yaml
+  - frontend-deployment.yaml
+  - ingress.yaml
+
+commonLabels:
+  project: public-bicycle-sharing
+  managed-by: sujal-reddy
+  academic-year: "2026-2027"

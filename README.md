@@ -134,16 +134,44 @@ Open **`http://localhost:3000`** in your browser.
 
 ---
 
-## 🐳 Docker Deployment (Docker Compose)
+## 🐳 Docker Containerization & Docker Hub Push
 
-The application includes production multi-stage Dockerfiles and a root `docker-compose.yml` file.
+The application includes production multi-stage Dockerfiles, a root `docker-compose.yml`, and turnkey automation scripts.
 
-### Start with Docker Compose
+### Build and Push Images to Docker Hub
+To build and publish both frontend and backend images to Docker Hub:
+
+```bash
+# Automated Windows Script:
+.\docker-build-push.bat sujalreddy latest
+
+# Automated Linux / macOS / WSL Script:
+chmod +x ./docker-build-push.sh
+./docker-build-push.sh sujalreddy latest
+```
+
+#### Manual Docker CLI Commands:
+```bash
+# 1. Login to Docker Hub
+docker login
+
+# 2. Build Backend Image (Node 20 Alpine Production)
+docker build -t sujalreddy/pbs-backend:latest ./backend
+
+# 3. Build Frontend Image (Vite React + Nginx Alpine Multi-stage)
+docker build -t sujalreddy/pbs-frontend:latest ./frontend
+
+# 4. Push to Docker Hub
+docker push sujalreddy/pbs-backend:latest
+docker push sujalreddy/pbs-frontend:latest
+```
+
+### Run Locally with Docker Compose
 ```bash
 # Build and run all 3 containers (MongoDB, Express Backend, React/Nginx Frontend):
 docker compose up --build
 
-# Run in background:
+# Run detached in background:
 docker compose up -d
 
 # View container status:
@@ -154,49 +182,76 @@ docker compose logs -f
 ```
 
 ### Accessing Docker Services
-- **Frontend Web UI:** `http://localhost:3000`
-- **Backend Health Check:** `http://localhost:5000/api/health`
+- **Frontend Web UI:** [http://localhost:3000](http://localhost:3000)
+- **Backend Health Check:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
 - **MongoDB Database:** `localhost:27017`
 
 ---
 
 ## ☸️ Kubernetes Deployment
 
-The `k8s/` directory contains all required Kubernetes resources.
+The `k8s/` directory contains all Kubernetes specifications, plus a unified all-in-one manifest and automated deploy scripts.
 
-### 1. Apply Manifests
+📖 **Detailed Guide:** See [docs/DOCKER_KUBERNETES_GUIDE.md](file:///c:/public%20bicycle%20sharing%20system/docs/DOCKER_KUBERNETES_GUIDE.md)
+
+### 1. Automated Deployment
 ```bash
-# Apply ConfigMap and Secrets
+# On Windows:
+.\k8s-deploy.bat
+
+# On Linux / macOS / WSL:
+chmod +x ./k8s-deploy.sh
+./k8s-deploy.sh
+```
+
+### 2. Manual Deployment via kubectl
+```bash
+# Option A: Deploy with unified all-in-one manifest
+kubectl apply -f k8s/pbs-complete.yaml
+
+# Option B: Deploy using Kustomize
+kubectl apply -k k8s/
+
+# Option C: Deploy individually in order
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
-
-# Deploy MongoDB Persistent Storage, Deployment and Service
 kubectl apply -f k8s/mongodb-pvc.yaml
 kubectl apply -f k8s/mongodb-deployment.yaml
 kubectl apply -f k8s/mongodb-service.yaml
-
-# Deploy Backend API Service
 kubectl apply -f k8s/backend-deployment.yaml
 kubectl apply -f k8s/backend-service.yaml
-
-# Deploy Frontend Web Application
 kubectl apply -f k8s/frontend-deployment.yaml
 kubectl apply -f k8s/frontend-service.yaml
-
-# Or apply all at once:
-kubectl apply -f k8s/
+kubectl apply -f k8s/ingress.yaml
 ```
 
-### 2. Verify Deployments & Pods
+### 3. Verify Deployments & Pods
 ```bash
 # Check Pods
-kubectl get pods -l app=pbs
+kubectl get pods -l app=pbs -o wide
 
 # Check Deployments
 kubectl get deployments -l app=pbs
 
-# Check Services
+# Check Services & NodePort
 kubectl get services -l app=pbs
+
+# Rollout status
+kubectl rollout status deployment/backend-deployment
+kubectl rollout status deployment/frontend-deployment
+```
+
+### 4. Accessing the Application in Kubernetes
+- **NodePort Access:** [http://localhost:30080](http://localhost:30080)
+- **Minikube:** `minikube service frontend-service`
+- **Port Forwarding:** `kubectl port-forward svc/frontend-service 8080:80` -> [http://localhost:8080](http://localhost:8080)
+- **Backend Health Check:** `kubectl port-forward svc/backend 5000:5000` -> [http://localhost:5000/api/health](http://localhost:5000/api/health)
+
+### 5. Teardown
+```bash
+.\k8s-teardown.bat
+# or
+kubectl delete -f k8s/pbs-complete.yaml
 ```
 
 ---

@@ -1,10 +1,31 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: backend
+  labels:
+    app: pbs
+    tier: backend
+    developer: sujal-reddy
+    hall-ticket: "2303A51713"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+      name: http
+  selector:
+    app: pbs
+    tier: backend
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: backend-service
   labels:
     app: pbs
     tier: backend
+    developer: sujal-reddy
+    hall-ticket: "2303A51713"
 spec:
   type: ClusterIP
   ports:

@@ -14,7 +14,7 @@ WORKDIR /usr/src/app
 
 # Install dependencies with cache optimization
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy application source code
 COPY . .

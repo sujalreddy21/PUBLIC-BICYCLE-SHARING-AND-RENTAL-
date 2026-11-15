@@ -92,8 +92,7 @@ web_modules/
 .DS_Store
 Thumbs.db
 
-# Frontend build
-dist/
+# Frontend build (un-ignored so compiled assets are bundled)
 dist-ssr/
 *.local
 

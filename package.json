@@ -5,9 +5,9 @@
   "private": true,
   "main": "backend/server.js",
   "scripts": {
-    "postinstall": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
-    "build": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
-    "start": "cd backend && npm start"
+    "postinstall": "npm --prefix frontend install --include=dev && npm --prefix frontend run build && npm --prefix backend install",
+    "build": "npm --prefix frontend install --include=dev && npm --prefix frontend run build && npm --prefix backend install",
+    "start": "node backend/server.js"
   },
   "keywords": [
     "bicycle-sharing",
